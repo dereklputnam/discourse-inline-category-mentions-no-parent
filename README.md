@@ -1,6 +1,6 @@
 # Discourse - Inline Category Mentions - no Parent
 
-A Discourse theme component that shortens inline `#category` mentions to just the category's own name. A subcategory mention that normally reads `Access Analyzer > Ideas` shows as `Ideas`.
+A Discourse theme component that shortens inline `#category` mentions to just the category's own name. A subcategory mention that normally reads `Community > Community Feedback` shows as `Community Feedback`.
 
 ## Where it applies
 
@@ -10,7 +10,7 @@ A Discourse theme component that shortens inline `#category` mentions to just th
 
 ## What it doesn't change
 
-This is display-only. Links, slugs, category names and permissions are untouched, and searching by slug (for example `#access-analyzer:ideas`) works as it does in core.
+This is display-only. Links, slugs, category names and permissions are untouched, and searching by slug (for example `#community:community-feedback`) works as it does in core.
 
 ## Settings
 
