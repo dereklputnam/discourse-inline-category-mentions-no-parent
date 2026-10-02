@@ -10,7 +10,11 @@ A Discourse theme component that shortens inline `#category` mentions to just th
 
 ## What it doesn't change
 
-This is display-only. Links, slugs, category names and permissions are untouched, and searching by slug (for example `#access-analyzer:ideas`) works as it does in core. The component has no settings.
+This is display-only. Links, slugs, category names and permissions are untouched, and searching by slug (for example `#access-analyzer:ideas`) works as it does in core.
+
+## Settings
+
+- **excluded_categories**: mentions of these categories keep their full `Parent > Child` text. It matches the mentioned category itself, so excluding a parent does not exclude its subcategories.
 
 ## Install
 

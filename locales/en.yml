@@ -4,3 +4,8 @@ en:
       Strips the parent category name from inline #category hashtag mentions,
       so "Parent > Child" shows as just "Child". Applies to mentions in posts,
       the composer's live preview, and the composer's mention autocomplete.
+    settings:
+      excluded_categories: >-
+        Mentions of these categories keep their full "Parent > Child" text.
+        This matches the mentioned category itself, so excluding a parent does
+        not exclude its subcategories.

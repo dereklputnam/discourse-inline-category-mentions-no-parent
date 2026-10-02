@@ -2,11 +2,34 @@ import { apiInitializer } from "discourse/lib/api";
 
 const SEPARATOR = " > ";
 
+// The category picker setting arrives as a pipe-separated string of IDs.
+const EXCLUDED_CATEGORY_IDS = new Set(
+  String(settings.excluded_categories || "")
+    .split("|")
+    .filter(Boolean)
+    .map(Number)
+);
+
+// Cooked mention links carry the category ID in data-id. The autocomplete
+// dropdown items have no ID attribute, so the only place it appears is the
+// icon's hashtag-color--category-<id> class.
+function autocompleteCategoryId(textSpan) {
+  const icon = textSpan
+    .closest(".hashtag-autocomplete__option")
+    ?.querySelector(".hashtag-category-icon");
+  const match = icon?.className.match(/hashtag-color--category-(\d+)/);
+  return match ? Number(match[1]) : null;
+}
+
 // Category hashtag mentions (#category) are cooked as a single text node
 // like "Parent > Child" — there's no separate element boundary between the
 // parent and child names to hide with CSS, so this strips the parent
 // segment client-side wherever that markup renders.
 function shortenHashtagLink(link) {
+  if (EXCLUDED_CATEGORY_IDS.has(Number(link.dataset.id))) {
+    return;
+  }
+
   const textSpan = link.querySelector("span:not(.hashtag-category-icon)");
   if (textSpan) {
     const index = textSpan.textContent.lastIndexOf(SEPARATOR);
@@ -37,6 +60,10 @@ function shortenCategoryHashtagsIn(root) {
 
 function shortenAutocompleteOptions() {
   document.querySelectorAll(".hashtag-autocomplete__text").forEach((span) => {
+    if (EXCLUDED_CATEGORY_IDS.has(autocompleteCategoryId(span))) {
+      return;
+    }
+
     const index = span.textContent.lastIndexOf(SEPARATOR);
     if (index !== -1) {
       span.textContent = span.textContent.slice(index + SEPARATOR.length);
