@@ -72,7 +72,7 @@ function observeLiveSurfaces() {
 
 export default apiInitializer((api) => {
   api.decorateCookedElement(shortenCategoryHashtagsIn, {
-    id: "netwrix-inline-category-mentions-no-parent",
+    id: "discourse-inline-category-mentions-no-parent",
   });
 
   observeLiveSurfaces();

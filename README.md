@@ -1,4 +1,4 @@
-# Netwrix - Inline Category Mentions - no Parent
+# Discourse - Inline Category Mentions - no Parent
 
 **Theme Summary**
 
