@@ -24,5 +24,5 @@ This is display-only. Links, slugs, category names and permissions are untouched
 
 ## Notes
 
-- The post mentions use Discourse's documented `decorateCookedElement` hook. The composer preview and autocomplete have no official hook, so a `MutationObserver` on the page body handles them.
+- The post mentions use Discourse's documented `decorateCookedElement` hook. The composer preview and autocomplete have no official hook, so each gets a small `MutationObserver` limited to its own container (`#reply-control` and `#d-menu-portals`), not the whole page.
 - It depends on core markup (`a.hashtag-cooked`, `.hashtag-autocomplete__text`, `.d-editor-preview`). If a Discourse upgrade renames those, mentions quietly show their full "Parent > Child" text again, so check after upgrading.

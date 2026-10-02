@@ -58,8 +58,8 @@ function shortenCategoryHashtagsIn(root) {
     .forEach(shortenHashtagLink);
 }
 
-function shortenAutocompleteOptions() {
-  document.querySelectorAll(".hashtag-autocomplete__text").forEach((span) => {
+function shortenAutocompleteOptions(root) {
+  root.querySelectorAll(".hashtag-autocomplete__text").forEach((span) => {
     if (EXCLUDED_CATEGORY_IDS.has(autocompleteCategoryId(span))) {
       return;
     }
@@ -71,29 +71,41 @@ function shortenAutocompleteOptions() {
   });
 }
 
-// Two surfaces render this same markup outside the post stream and aren't
-// reached by decorateCookedElement: the composer's live preview pane (which
-// re-cooks on every keystroke) and the #category autocomplete dropdown (a
-// floating-menu portal created on demand). Neither has a core value
-// transformer, so a MutationObserver on document.body (always present at
-// init time) covers both. The re-check-before-write guard (lastIndexOf
-// returns -1 once already shortened) prevents an infinite loop from our own
-// edits re-triggering the observer.
-function observeLiveSurfaces() {
-  const observer = new MutationObserver(() => {
-    const preview = document.querySelector(".d-editor-preview");
+// The composer's live preview and the # autocomplete dropdown render this
+// same markup outside the post stream, so decorateCookedElement never sees
+// them, and core has no hook for either. Each gets its own observer, limited
+// to its own container and coalesced to one run per frame. The
+// re-check-before-write guard (lastIndexOf returns -1 once already
+// shortened) keeps our own edits from re-triggering the work.
+const observed = new WeakSet();
+
+function observeOnce(selector, callback) {
+  const element = document.querySelector(selector);
+  if (!element || observed.has(element)) {
+    return;
+  }
+  observed.add(element);
+
+  let queued = false;
+  new MutationObserver(() => {
+    if (queued) {
+      return;
+    }
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      callback(element);
+    });
+  }).observe(element, { childList: true, subtree: true, characterData: true });
+}
+
+function observeComposerSurfaces() {
+  observeOnce("#d-menu-portals", shortenAutocompleteOptions);
+  observeOnce("#reply-control", (composer) => {
+    const preview = composer.querySelector(".d-editor-preview");
     if (preview) {
       shortenCategoryHashtagsIn(preview);
     }
-    if (document.querySelector(".hashtag-autocomplete")) {
-      shortenAutocompleteOptions();
-    }
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    characterData: true,
   });
 }
 
@@ -102,5 +114,9 @@ export default apiInitializer((api) => {
     id: "discourse-inline-category-mentions-no-parent",
   });
 
-  observeLiveSurfaces();
+  observeComposerSurfaces();
+
+  // Fires for the initial page load as well. The containers above may not
+  // exist yet when this initializer runs, so they are (re)attached here.
+  api.onPageChange(observeComposerSurfaces);
 });
