@@ -1,0 +1,6 @@
+en:
+  theme_metadata:
+    description: >-
+      Strips the parent category name from inline #category hashtag mentions,
+      so "Parent > Child" shows as just "Child". Applies to mentions in posts,
+      the composer's live preview, and the composer's mention autocomplete.
